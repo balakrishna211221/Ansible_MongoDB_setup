@@ -1,0 +1,28 @@
+
+
+
+
+- hosts: all
+  remote_user: root
+  tasks:
+  - name: Add mongo ppa key
+    sudo: yes
+    apt_key: >
+      keyserver=hkp://keyserver.ubuntu.com:80
+      id=7F0CEB10
+      state=present
+  - name: Add mongo sources list
+    sudo: yes
+    lineinfile: >
+      line="deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse"
+      dest=/etc/apt/sources.list.d/mongodb.list
+      state=present
+      create=yes
+  - name: Install mongo
+    sudo: yes
+    apt: pkg=mongodb-org state=latest force=yes
+    notify:
+    - start mongodb
+  handlers:
+    - name: start mongodb
+      service: name=mongod state=started
